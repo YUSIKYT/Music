@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoundNode — басс буст и профиль</title>
+    <title>SoundNode — авто-плейлисты по исполнителям</title>
     <style>
         * {
             margin: 0;
@@ -248,6 +248,145 @@
         .card-artist {
             color: #B3B3B3;
             font-size: 14px;
+        }
+
+        /* Сетка исполнителей */
+        .artists-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .artist-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 204, 0, 0.1);
+            text-align: center;
+        }
+
+        .artist-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 204, 0, 0.1);
+            border-color: #FC0;
+            box-shadow: 0 10px 30px rgba(255, 204, 0, 0.2);
+        }
+
+        .artist-card-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #333, #1A1A1A);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #FC0;
+            border: 3px solid rgba(255, 204, 0, 0.3);
+        }
+
+        .artist-card-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .artist-card-count {
+            color: #FC0;
+            font-size: 14px;
+        }
+
+        .artist-card-tracks {
+            color: #B3B3B3;
+            font-size: 13px;
+            margin-top: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Страница исполнителя */
+        .artist-header {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            margin-bottom: 40px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 204, 0, 0.2);
+        }
+
+        .artist-avatar {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #FC0, #FFA500);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: #000;
+            box-shadow: 0 10px 30px rgba(255, 204, 0, 0.3);
+        }
+
+        .artist-info h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #FC0, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .artist-info p {
+            color: #B3B3B3;
+            font-size: 18px;
+        }
+
+        .artist-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .artist-stat {
+            text-align: center;
+        }
+
+        .artist-stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #FC0;
+        }
+
+        .artist-stat-label {
+            font-size: 14px;
+            color: #B3B3B3;
+        }
+
+        /* Навигация назад */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #FC0;
+            cursor: pointer;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 30px;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 204, 0, 0.2);
+        }
+
+        .back-button:hover {
+            background: #FC0;
+            color: #000;
         }
 
         /* Секция треков */
@@ -715,7 +854,7 @@
             width: 28px;
         }
 
-        /* Басс буст - теперь реальный */
+        /* Басс буст */
         .bass-boost-container {
             background: rgba(255, 204, 0, 0.1);
             border-radius: 16px;
@@ -798,28 +937,7 @@
             color: #000;
         }
 
-        /* Индикатор баса в плеере */
-        .bass-indicator {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-left: 10px;
-        }
-
-        .bass-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #B3B3B3;
-            transition: all 0.3s;
-        }
-
-        .bass-dot.active {
-            background: #FC0;
-            box-shadow: 0 0 10px #FC0;
-        }
-
-        /* Кнопка в профиле */
+        /* Кнопка профиля */
         .profile-button {
             position: fixed;
             bottom: 120px;
@@ -1236,6 +1354,10 @@
                 <span class="nav-icon">🏠</span>
                 Главная
             </div>
+            <div class="nav-item" onclick="showPage('artists', this)">
+                <span class="nav-icon">🎤</span>
+                Исполнители
+            </div>
             <div class="nav-item" onclick="openFullProfile()">
                 <span class="nav-icon">👤</span>
                 Мой профиль
@@ -1254,14 +1376,14 @@
             </div>
 
             <div class="playlist-section">
-                <div class="playlist-title">МОИ ПЛЕЙЛИСТЫ</div>
+                <div class="playlist-title">АВТО-ПЛЕЙЛИСТЫ</div>
                 <div class="nav-item" onclick="showPage('all', this)">
                     <span class="nav-icon">📁</span>
                     Все треки
                 </div>
-                <div class="nav-item" onclick="showPage('favorites', this)">
-                    <span class="nav-icon">⭐</span>
-                    Любимое
+                <div class="nav-item" onclick="showPage('artists', this)">
+                    <span class="nav-icon">🎤</span>
+                    По исполнителям
                 </div>
             </div>
         </div>
@@ -1289,7 +1411,7 @@
             </div>
         </div>
 
-        <!-- Кнопка профиля (новая!) -->
+        <!-- Кнопка профиля -->
         <div class="profile-button" onclick="openFullProfile()" title="Мой профиль">
             👤
         </div>
@@ -1305,9 +1427,9 @@
                 <div class="settings-close" onclick="toggleSettings()">✕</div>
             </div>
 
-            <!-- РЕАЛЬНЫЙ БАСС БУСТ -->
+            <!-- Басс буст -->
             <div class="settings-section">
-                <div class="settings-section-title">🔊 БАСС БУСТ (РЕАЛЬНЫЙ)</div>
+                <div class="settings-section-title">🔊 БАСС БУСТ</div>
                 <div class="bass-boost-container">
                     <div class="bass-boost-header">
                         <div class="bass-boost-title">
@@ -1323,17 +1445,7 @@
                         <div class="bass-preset" onclick="setBassPreset(15)">🔊 Сильный</div>
                         <div class="bass-preset" onclick="setBassPreset(20)">💥 Макс</div>
                     </div>
-                    <div style="margin-top: 15px; font-size: 12px; color: #FC0; text-align: center;">
-                        ⚡ Реальный басс буст через Web Audio API
-                    </div>
                 </div>
-            </div>
-
-            <!-- Индикатор баса в плеере -->
-            <div class="bass-indicator" id="bassIndicator" style="display: none;">
-                <span class="bass-dot"></span>
-                <span class="bass-dot"></span>
-                <span class="bass-dot"></span>
             </div>
         </div>
 
@@ -1467,6 +1579,9 @@
             lastWeek: new Date().toDateString()
         };
 
+        // Кэш исполнителей
+        let artistsCache = null;
+
         // ==================== ЭЛЕМЕНТЫ ====================
         const audio = document.getElementById('audioPlayer');
         const playPauseBtn = document.getElementById('playPauseBtn');
@@ -1494,159 +1609,76 @@
         const bassSlider = document.getElementById('bassSlider');
         const bassValue = document.getElementById('bassValue');
 
-        // ==================== ИНИЦИАЛИЗАЦИЯ AUDIO CONTEXT ====================
-        async function initAudioContext() {
-            if (isAudioInitialized) return;
+        // ==================== ФУНКЦИИ ДЛЯ АВТО-ПЛЕЙЛИСТОВ ====================
+        
+        // Извлечение исполнителя из названия файла
+        function extractArtistFromFilename(filename) {
+            let name = filename.replace(/\.[^/.]+$/, "");
             
-            try {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                
-                // Создаем фильтр баса
-                bassFilter = audioContext.createBiquadFilter();
-                bassFilter.type = 'lowshelf';
-                bassFilter.frequency.value = 150;
-                bassFilter.gain.value = bassBoost;
-                
-                // Подключаем аудио элемент
-                sourceNode = audioContext.createMediaElementSource(audio);
-                sourceNode.connect(bassFilter);
-                bassFilter.connect(audioContext.destination);
-                
-                isAudioInitialized = true;
-                console.log('AudioContext инициализирован, басс буст:', bassBoost);
-                
-                // Обновляем цвет кнопки
-                updateBassButtonColor();
-                
-            } catch (e) {
-                console.warn('Web Audio API не поддерживается', e);
-                showNotification('Ошибка', 'Басс буст не поддерживается в вашем браузере');
-            }
-        }
-
-        // Функция для обновления баса в реальном времени
-        function updateBassFilter() {
-            if (bassFilter) {
-                bassFilter.gain.value = bassBoost;
-                console.log('Басс буст обновлен:', bassBoost);
-                updateBassButtonColor();
-            }
-        }
-
-        // Обновление цвета кнопки баса
-        function updateBassButtonColor() {
-            if (bassBoost > 0) {
-                bassBtn.style.color = '#FC0';
-                // Добавляем анимацию
-                bassBtn.style.transform = 'scale(1.2)';
-                setTimeout(() => bassBtn.style.transform = 'scale(1)', 200);
-            } else {
-                bassBtn.style.color = '#B3B3B3';
-            }
-        }
-
-        // ==================== ЗАГРУЗКА ====================
-        window.addEventListener('DOMContentLoaded', () => {
-            loadMusic();
-            checkStats();
-            updateStatsDisplay();
-            loadSettings();
+            const patterns = [
+                /^(.+?)\s*[–—-]\s*(.+)$/,
+                /^(.+?)\s*-\s*(.+)$/,
+                /^(.+?)\s*\[\s*(.+)\s*\]$/,
+                /^(.+?)\s*\(\s*(.+)\s*\)$/,
+                /^(.+?)\s*—\s*(.+)$/,
+                /^(.+?)\s*(?:ft\.|feat\.|feat)\s*(.+)$/i
+            ];
             
-            // Инициализируем AudioContext при первом взаимодействии
-            document.addEventListener('click', function initOnClick() {
-                if (!isAudioInitialized) {
-                    initAudioContext();
+            for (let pattern of patterns) {
+                const match = name.match(pattern);
+                if (match) {
+                    let artist = match[1].trim();
+                    artist = artist.replace(/\s*\[[^\]]*\]$/, '');
+                    artist = artist.replace(/\s*\([^)]*\)$/, '');
+                    return artist;
                 }
-                document.removeEventListener('click', initOnClick);
-            }, { once: true });
-        });
-
-        function loadSettings() {
-            // Загружаем сохраненные настройки
-            bassSlider.value = bassBoost;
-            bassValue.textContent = bassBoost + ' dB';
-            updateBassButtonColor();
+            }
+            
+            return "Разное";
         }
 
-        // События аудио
-        audio.addEventListener('play', async () => {
-            isPlaying = true;
-            playPauseBtn.innerHTML = '⏸';
+        // Группировка треков по исполнителям
+        function groupTracksByArtist(tracks) {
+            if (artistsCache) return artistsCache;
             
-            // Инициализируем AudioContext при первом воспроизведении
-            if (!isAudioInitialized) {
-                await initAudioContext();
-            }
+            const artists = {};
             
-            // Возобновляем контекст если он приостановлен
-            if (audioContext && audioContext.state === 'suspended') {
-                await audioContext.resume();
-            }
-        });
+            tracks.forEach(track => {
+                const filename = track.name;
+                const artist = extractArtistFromFilename(filename);
+                
+                if (!artists[artist]) {
+                    artists[artist] = {
+                        name: artist,
+                        tracks: [],
+                        count: 0
+                    };
+                }
+                
+                artists[artist].tracks.push(track);
+                artists[artist].count++;
+            });
+            
+            const artistsArray = Object.values(artists).sort((a, b) => b.count - a.count);
+            artistsCache = artistsArray;
+            return artistsArray;
+        }
+
+        // Получение треков конкретного исполнителя
+        function getArtistTracks(artistName) {
+            const artists = groupTracksByArtist(currentTracks);
+            const artist = artists.find(a => a.name === artistName);
+            return artist ? artist.tracks : [];
+        }
+
+        // ==================== СТРАНИЦЫ ====================
         
-        audio.addEventListener('pause', () => {
-            isPlaying = false;
-            playPauseBtn.innerHTML = '▶';
-        });
-        
-        audio.addEventListener('timeupdate', updateProgress);
-        audio.addEventListener('loadedmetadata', updateDuration);
-        audio.addEventListener('ended', nextTrack);
-
-        // ==================== НАСТРОЙКИ ====================
-        function toggleSettings() {
-            settingsPanel.classList.toggle('open');
-        }
-
-        // Басс буст - реальный!
-        bassSlider.addEventListener('input', function(e) {
-            const val = parseInt(e.target.value);
-            bassValue.textContent = val + ' dB';
-            bassBoost = val;
-            localStorage.setItem('bassBoost', bassBoost);
-            
-            // Обновляем фильтр в реальном времени
-            if (bassFilter) {
-                bassFilter.gain.value = val;
-                console.log('Басс буст изменен:', val);
-            } else if (isAudioInitialized) {
-                // Если фильтр не создан, но контекст инициализирован
-                updateBassFilter();
-            }
-            
-            updateBassButtonColor();
-            
-            // Показываем уведомление
-            if (val > 0) {
-                showNotification('🔊 Басс буст', `Усиление ${val} dB`);
-            }
-        });
-
-        function setBassPreset(val) {
-            bassSlider.value = val;
-            bassValue.textContent = val + ' dB';
-            bassBoost = val;
-            localStorage.setItem('bassBoost', bassBoost);
-            
-            if (bassFilter) {
-                bassFilter.gain.value = val;
-            }
-            
-            updateBassButtonColor();
-            
-            if (val === 0) {
-                showNotification('🔇 Басс буст', 'Выключен');
-            } else {
-                showNotification('🔊 Басс буст', `Установлен на ${val} dB`);
-            }
-        }
-
-        // ==================== НАВИГАЦИЯ ====================
         function showPage(page, element) {
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             if (element) element.classList.add('active');
 
             if (page === 'home') showHomePage();
+            else if (page === 'artists') showArtistsPage();
             else if (page === 'favorites') showFavoritesPage();
             else if (page === 'all') showAllTracksPage();
             else if (page === 'playlists') showPlaylistsPage();
@@ -1658,35 +1690,36 @@
                 return;
             }
 
+            const artists = groupTracksByArtist(currentTracks);
+            const topArtists = artists.slice(0, 4);
+
             let html = `
                 <div class="welcome">
-                    <h1>⚡ SoundNode с басс бустом</h1>
-                    <p>Твоя музыка с реальным усилением баса</p>
+                    <h1>⚡ SoundNode</h1>
+                    <p>Автоматические плейлисты по исполнителям</p>
                 </div>
 
-                <div class="grid">
-                    <div class="card" onclick="showPage('all', document.querySelector('[onclick*=\\'all\\']'))">
-                        <div class="card-image">🎵</div>
-                        <div class="card-title">Все треки</div>
-                        <div class="card-artist">${currentTracks.length} треков</div>
-                    </div>
-                    <div class="card" onclick="showPage('favorites', document.querySelector('[onclick*=\\'favorites\\']'))">
-                        <div class="card-image">❤️</div>
-                        <div class="card-title">Любимое</div>
-                        <div class="card-artist">${favorites.length} треков</div>
-                    </div>
-                    <div class="card" onclick="toggleSettings()">
-                        <div class="card-image">⚙️</div>
-                        <div class="card-title">Басс буст</div>
-                        <div class="card-artist">${bassBoost} dB</div>
-                    </div>
-                    <div class="card" onclick="openFullProfile()">
-                        <div class="card-image">👤</div>
-                        <div class="card-title">Профиль</div>
-                        <div class="card-artist">Статистика</div>
-                    </div>
+                <div class="section-title">
+                    <h2>Популярные исполнители</h2>
+                    <button onclick="showPage('artists', document.querySelector('[onclick*=\\'artists\\']'))">Все →</button>
                 </div>
 
+                <div class="artists-grid" style="grid-template-columns: repeat(4, 1fr);">
+            `;
+
+            topArtists.forEach(artist => {
+                html += `
+                    <div class="artist-card" onclick="showArtistPage('${artist.name}')">
+                        <div class="artist-card-icon">🎤</div>
+                        <div class="artist-card-name">${artist.name}</div>
+                        <div class="artist-card-count">${artist.count} треков</div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+
+            html += `
                 <div class="section-title">
                     <h2>Недавно добавленные</h2>
                     <button onclick="loadMusic()">🔄 Обновить</button>
@@ -1704,6 +1737,7 @@
 
             currentTracks.slice(0, 5).forEach((track, index) => {
                 const songName = track.name.replace(/\.[^/.]+$/, "");
+                const artist = extractArtistFromFilename(track.name);
                 const isFavorite = favorites.includes(track.download_url);
                 const isPlaying = currentTrackIndex === index;
                 
@@ -1713,11 +1747,11 @@
                         <div class="track-info">
                             <div class="track-image">🎵</div>
                             <div class="track-details">
-                                <div class="track-name">${songName}</div>
-                                <div class="track-artist">Из папки music</div>
+                                <div class="track-name">${songName.replace(artist, '').replace(/[-–—]/, '').trim()}</div>
+                                <div class="track-artist">${artist}</div>
                             </div>
                         </div>
-                        <div class="track-album">SoundNode</div>
+                        <div class="track-album">Авто-плейлист</div>
                         <div class="track-duration">${(track.size / 1024 / 1024).toFixed(2)} MB</div>
                         <div class="track-actions">
                             <div class="track-favorite ${isFavorite ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${track.download_url}')">
@@ -1733,6 +1767,137 @@
 
             html += '</div>';
             content.innerHTML = html;
+        }
+
+        function showArtistsPage() {
+            if (currentTracks.length === 0) {
+                content.innerHTML = '<div style="text-align: center; padding: 50px;">Загрузка музыки...</div>';
+                return;
+            }
+
+            const artists = groupTracksByArtist(currentTracks);
+            
+            let html = `
+                <div class="welcome">
+                    <h1>🎤 Исполнители</h1>
+                    <p>Автоматически сгруппировано по артистам (${artists.length} исполнителей)</p>
+                </div>
+
+                <div class="artists-grid">
+            `;
+
+            artists.forEach(artist => {
+                const previewTracks = artist.tracks.slice(0, 3).map(t => 
+                    t.name.replace(/\.[^/.]+$/, "").replace(artist.name, '').replace(/[-–—]/, '').trim()
+                ).join(', ');
+                
+                html += `
+                    <div class="artist-card" onclick="showArtistPage('${artist.name}')">
+                        <div class="artist-card-icon">🎤</div>
+                        <div class="artist-card-name">${artist.name}</div>
+                        <div class="artist-card-count">${artist.count} треков</div>
+                        <div class="artist-card-tracks">${previewTracks}</div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            content.innerHTML = html;
+        }
+
+        function showArtistPage(artistName) {
+            const artistTracks = getArtistTracks(artistName);
+            
+            let html = `
+                <div class="back-button" onclick="showArtistsPage()">
+                    ← К списку исполнителей
+                </div>
+
+                <div class="artist-header">
+                    <div class="artist-avatar">🎤</div>
+                    <div class="artist-info">
+                        <h1>${artistName}</h1>
+                        <p>Автоматический плейлист</p>
+                        <div class="artist-stats">
+                            <div class="artist-stat">
+                                <div class="artist-stat-value">${artistTracks.length}</div>
+                                <div class="artist-stat-label">треков</div>
+                            </div>
+                            <div class="artist-stat">
+                                <div class="artist-stat-value">${Math.round(artistTracks.reduce((acc, t) => acc + t.size, 0) / 1024 / 1024)}</div>
+                                <div class="artist-stat-label">MB</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    <h2>Все треки исполнителя</h2>
+                    <button onclick="playArtistTracks('${artistName}')">▶ Слушать всё</button>
+                </div>
+
+                <div class="track-list">
+                    <div class="track-header">
+                        <div class="track-number">#</div>
+                        <div class="track-title">НАЗВАНИЕ</div>
+                        <div class="track-album">АЛЬБОМ</div>
+                        <div class="track-duration"></div>
+                        <div class="track-actions"></div>
+                    </div>
+            `;
+
+            artistTracks.forEach((track, index) => {
+                let songName = track.name.replace(/\.[^/.]+$/, "");
+                songName = songName.replace(new RegExp(`^${artistName}\\s*[-–—]?\\s*`), '');
+                
+                const originalIndex = currentTracks.findIndex(t => t.download_url === track.download_url);
+                const isFavorite = favorites.includes(track.download_url);
+                const isPlaying = currentTrackIndex === originalIndex;
+                
+                html += `
+                    <div class="track-item ${isPlaying ? 'playing' : ''}" onclick="playTrack(${originalIndex})">
+                        <div class="track-number">${index + 1}</div>
+                        <div class="track-info">
+                            <div class="track-image">🎵</div>
+                            <div class="track-details">
+                                <div class="track-name">${songName}</div>
+                                <div class="track-artist">${artistName}</div>
+                            </div>
+                        </div>
+                        <div class="track-album">Авто-плейлист</div>
+                        <div class="track-duration">${(track.size / 1024 / 1024).toFixed(2)} MB</div>
+                        <div class="track-actions">
+                            <div class="track-favorite ${isFavorite ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${track.download_url}')">
+                                ${isFavorite ? '❤️' : '🤍'}
+                            </div>
+                            <div class="track-queue" onclick="event.stopPropagation(); addToQueue(${originalIndex})">
+                                ➕
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            content.innerHTML = html;
+        }
+
+        function playArtistTracks(artistName) {
+            const artistTracks = getArtistTracks(artistName);
+            if (artistTracks.length === 0) return;
+            
+            const trackIndices = artistTracks
+                .map(t => currentTracks.findIndex(ct => ct.download_url === t.download_url))
+                .filter(idx => idx !== -1);
+            
+            if (trackIndices.length === 0) return;
+            
+            queue = trackIndices;
+            updateQueueDisplay();
+            
+            playTrack(trackIndices[0]);
+            
+            showNotification('🎤 Плейлист', `${artistName} — ${trackIndices.length} треков`);
         }
 
         function showFavoritesPage() {
@@ -1761,6 +1926,7 @@
             } else {
                 favoriteTracks.forEach((track, index) => {
                     const songName = track.name.replace(/\.[^/.]+$/, "");
+                    const artist = extractArtistFromFilename(track.name);
                     const originalIndex = currentTracks.findIndex(t => t.download_url === track.download_url);
                     
                     html += `
@@ -1769,11 +1935,11 @@
                             <div class="track-info">
                                 <div class="track-image">🎵</div>
                                 <div class="track-details">
-                                    <div class="track-name">${songName}</div>
-                                    <div class="track-artist">Из папки music</div>
+                                    <div class="track-name">${songName.replace(artist, '').replace(/[-–—]/, '').trim()}</div>
+                                    <div class="track-artist">${artist}</div>
                                 </div>
                             </div>
-                            <div class="track-album">SoundNode</div>
+                            <div class="track-album">Избранное</div>
                             <div class="track-duration">${(track.size / 1024 / 1024).toFixed(2)} MB</div>
                             <div class="track-actions">
                                 <div class="track-favorite active" onclick="event.stopPropagation(); toggleFavorite('${track.download_url}')">
@@ -1813,6 +1979,7 @@
 
             currentTracks.forEach((track, index) => {
                 const songName = track.name.replace(/\.[^/.]+$/, "");
+                const artist = extractArtistFromFilename(track.name);
                 const isFavorite = favorites.includes(track.download_url);
                 const isPlaying = currentTrackIndex === index;
                 
@@ -1823,10 +1990,10 @@
                             <div class="track-image">🎵</div>
                             <div class="track-details">
                                 <div class="track-name">${songName}</div>
-                                <div class="track-artist">Из папки music</div>
+                                <div class="track-artist">${artist}</div>
                             </div>
                         </div>
-                        <div class="track-album">SoundNode</div>
+                        <div class="track-album">Библиотека</div>
                         <div class="track-duration">${(track.size / 1024 / 1024).toFixed(2)} MB</div>
                         <div class="track-actions">
                             <div class="track-favorite ${isFavorite ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${track.download_url}')">
@@ -1855,6 +2022,8 @@
 
         // ==================== ЗАГРУЗКА МУЗЫКИ ====================
         async function loadMusic() {
+            artistsCache = null;
+            
             try {
                 let response = await fetch('https://api.github.com/repos/YUSIKYT/Music/contents/music');
                 
@@ -1895,9 +2064,10 @@
             currentTrackIndex = index;
             const track = currentTracks[index];
             const songName = track.name.replace(/\.[^/.]+$/, "");
+            const artist = extractArtistFromFilename(track.name);
             
-            currentTrackName.textContent = songName;
-            currentTrackArtist.textContent = 'Из папки music';
+            currentTrackName.textContent = songName.replace(artist, '').replace(/[-–—]/, '').trim();
+            currentTrackArtist.textContent = artist;
             
             const rawUrl = track.download_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
             audio.src = rawUrl;
@@ -1906,7 +2076,6 @@
             try {
                 await audio.play();
                 
-                // Инициализируем AudioContext при первом воспроизведении
                 if (!isAudioInitialized) {
                     await initAudioContext();
                 }
@@ -1921,11 +2090,250 @@
                 if (activeNav.textContent.includes('Главная')) showHomePage();
                 else if (activeNav.textContent.includes('Любимое')) showFavoritesPage();
                 else if (activeNav.textContent.includes('Все треки')) showAllTracksPage();
+                else if (activeNav.textContent.includes('Исполнители')) showArtistsPage();
             }
             
             showNotification('Сейчас играет', songName);
         }
 
+        // ==================== ИНИЦИАЛИЗАЦИЯ AUDIO CONTEXT ====================
+        async function initAudioContext() {
+            if (isAudioInitialized) return;
+            
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                bassFilter = audioContext.createBiquadFilter();
+                bassFilter.type = 'lowshelf';
+                bassFilter.frequency.value = 150;
+                bassFilter.gain.value = bassBoost;
+                
+                sourceNode = audioContext.createMediaElementSource(audio);
+                sourceNode.connect(bassFilter);
+                bassFilter.connect(audioContext.destination);
+                
+                isAudioInitialized = true;
+                updateBassButtonColor();
+                
+            } catch (e) {
+                console.warn('Web Audio API не поддерживается', e);
+            }
+        }
+
+        function updateBassButtonColor() {
+            if (bassBoost > 0) {
+                bassBtn.style.color = '#FC0';
+                bassBtn.style.transform = 'scale(1.2)';
+                setTimeout(() => bassBtn.style.transform = 'scale(1)', 200);
+            } else {
+                bassBtn.style.color = '#B3B3B3';
+            }
+        }
+
+        // ==================== НАСТРОЙКИ ====================
+        function toggleSettings() {
+            settingsPanel.classList.toggle('open');
+        }
+
+        bassSlider.addEventListener('input', function(e) {
+            const val = parseInt(e.target.value);
+            bassValue.textContent = val + ' dB';
+            bassBoost = val;
+            localStorage.setItem('bassBoost', bassBoost);
+            
+            if (bassFilter) {
+                bassFilter.gain.value = val;
+            }
+            
+            updateBassButtonColor();
+            
+            if (val > 0) {
+                showNotification('🔊 Басс буст', `Усиление ${val} dB`);
+            }
+        });
+
+        function setBassPreset(val) {
+            bassSlider.value = val;
+            bassValue.textContent = val + ' dB';
+            bassBoost = val;
+            localStorage.setItem('bassBoost', bassBoost);
+            
+            if (bassFilter) {
+                bassFilter.gain.value = val;
+            }
+            
+            updateBassButtonColor();
+            
+            if (val === 0) {
+                showNotification('🔇 Басс буст', 'Выключен');
+            } else {
+                showNotification('🔊 Басс буст', `Установлен на ${val} dB`);
+            }
+        }
+
+        // ==================== ОЧЕРЕДЬ ====================
+        function addToQueue(index) {
+            if (!queue.includes(index)) {
+                queue.push(index);
+                updateQueueDisplay();
+                showNotification('Добавлено в очередь', currentTracks[index].name.replace(/\.[^/.]+$/, ""));
+            }
+        }
+
+        function removeFromQueue(i) {
+            queue.splice(i, 1);
+            updateQueueDisplay();
+        }
+
+        function updateQueueDisplay() {
+            const queueItems = document.getElementById('queueItems');
+            if (queue.length === 0) {
+                queueItems.innerHTML = '<div style="text-align: center; color: #B3B3B3;">Очередь пуста</div>';
+                return;
+            }
+
+            let html = '';
+            queue.forEach((idx, i) => {
+                const track = currentTracks[idx];
+                const name = track.name.replace(/\.[^/.]+$/, "");
+                const artist = extractArtistFromFilename(track.name);
+                html += `
+                    <div class="queue-item ${currentTrackIndex === idx ? 'playing' : ''}">
+                        <span class="queue-number">${i+1}</span>
+                        <div class="queue-item-info">
+                            <div class="queue-item-name">${name.replace(artist, '').replace(/[-–—]/, '').trim()}</div>
+                            <div class="queue-item-artist">${artist}</div>
+                        </div>
+                        <div class="queue-remove" onclick="removeFromQueue(${i})">✕</div>
+                    </div>
+                `;
+            });
+            queueItems.innerHTML = html;
+        }
+
+        function toggleQueue() {
+            document.getElementById('queuePanel').classList.toggle('open');
+            updateQueueDisplay();
+        }
+
+        // ==================== ЛЮБИМОЕ ====================
+        function toggleFavorite(url) {
+            const idx = favorites.indexOf(url);
+            if (idx === -1) {
+                favorites.push(url);
+                showNotification('❤️', 'Добавлено в любимое');
+            } else {
+                favorites.splice(idx, 1);
+                showNotification('💔', 'Удалено из любимого');
+            }
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            
+            const active = document.querySelector('.nav-item.active');
+            if (active) {
+                if (active.textContent.includes('Главная')) showHomePage();
+                else if (active.textContent.includes('Любимое')) showFavoritesPage();
+                else if (active.textContent.includes('Все треки')) showAllTracksPage();
+                else if (active.textContent.includes('Исполнители')) showArtistsPage();
+            }
+        }
+
+        // ==================== СТАТИСТИКА ====================
+        function checkStats() {
+            const today = new Date().toDateString();
+            if (stats.date !== today) {
+                stats.week += stats.today;
+                stats.today = 0;
+                stats.date = today;
+                localStorage.setItem('stats', JSON.stringify(stats));
+            }
+        }
+
+        function updateStats(minutes) {
+            stats.today += minutes;
+            stats.week += minutes;
+            stats.total += minutes;
+            localStorage.setItem('stats', JSON.stringify(stats));
+            updateStatsDisplay();
+        }
+
+        function updateStatsDisplay() {
+            document.getElementById('todayStats').textContent = Math.round(stats.today);
+            document.getElementById('totalStats').textContent = Math.round(stats.total);
+            if (document.getElementById('fullStatToday')) {
+                document.getElementById('fullStatToday').textContent = Math.round(stats.today);
+                document.getElementById('fullStatWeek').textContent = Math.round(stats.week);
+                document.getElementById('fullStatTotal').textContent = Math.round(stats.total);
+            }
+        }
+
+        // ==================== ПРОФИЛЬ ====================
+        function openFullProfile() {
+            profileFull.classList.add('open');
+            updateStatsDisplay();
+            switchProfileTab('favorites');
+        }
+
+        function closeFullProfile() {
+            profileFull.classList.remove('open');
+        }
+
+        function switchProfileTab(tab, el) {
+            document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+            if (el) el.classList.add('active');
+
+            const favTracks = currentTracks.filter(t => favorites.includes(t.download_url));
+            
+            if (tab === 'favorites') {
+                let html = '<div class="favorites-grid">';
+                favTracks.slice(0, 20).forEach(t => {
+                    const name = t.name.replace(/\.[^/.]+$/, "");
+                    const artist = extractArtistFromFilename(t.name);
+                    const idx = currentTracks.findIndex(tr => tr.download_url === t.download_url);
+                    html += `
+                        <div class="favorite-card" onclick="playTrack(${idx})">
+                            <div class="favorite-card-icon">🎵</div>
+                            <div class="favorite-card-info">
+                                <div class="favorite-card-name">${name.replace(artist, '').replace(/[-–—]/, '').trim()}</div>
+                                <div class="favorite-card-artist">${artist}</div>
+                            </div>
+                            <div class="favorite-card-play">▶</div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                if (favTracks.length === 0) html = '<div style="text-align: center; padding: 40px;">Нет любимых треков</div>';
+                document.getElementById('profileContent').innerHTML = html;
+            } else if (tab === 'recent') {
+                document.getElementById('profileContent').innerHTML = '<div style="text-align: center; padding: 40px;">🕒 История прослушиваний появится скоро</div>';
+            } else if (tab === 'stats') {
+                document.getElementById('profileContent').innerHTML = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; text-align: center;">
+                            <div style="font-size: 48px; color: #FC0;">${Math.round(stats.today)}</div>
+                            <div style="color: #B3B3B3;">Минут сегодня</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; text-align: center;">
+                            <div style="font-size: 48px; color: #FC0;">${Math.round(stats.week)}</div>
+                            <div style="color: #B3B3B3;">За неделю</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; text-align: center; grid-column: span 2;">
+                            <div style="font-size: 64px; color: #FC0;">${Math.round(stats.total)}</div>
+                            <div style="color: #B3B3B3;">Всего минут</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; text-align: center;">
+                            <div style="font-size: 48px; color: #FC0;">${currentTracks.length}</div>
+                            <div style="color: #B3B3B3;">Всего треков</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; text-align: center;">
+                            <div style="font-size: 48px; color: #FC0;">${favorites.length}</div>
+                            <div style="color: #B3B3B3;">В любимом</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // ==================== УПРАВЛЕНИЕ ПЛЕЕРОМ ====================
         function togglePlayPause() {
             if (!audio.src) {
                 if (currentTracks.length > 0) playTrack(0);
@@ -2019,165 +2427,6 @@
             showNotification('Скорость', currentSpeed + 'x');
         }
 
-        // ==================== ОЧЕРЕДЬ ====================
-        function addToQueue(index) {
-            if (!queue.includes(index)) {
-                queue.push(index);
-                updateQueueDisplay();
-                showNotification('Добавлено в очередь', currentTracks[index].name.replace(/\.[^/.]+$/, ""));
-            }
-        }
-
-        function removeFromQueue(i) {
-            queue.splice(i, 1);
-            updateQueueDisplay();
-        }
-
-        function updateQueueDisplay() {
-            const queueItems = document.getElementById('queueItems');
-            if (queue.length === 0) {
-                queueItems.innerHTML = '<div style="text-align: center; color: #B3B3B3;">Очередь пуста</div>';
-                return;
-            }
-
-            let html = '';
-            queue.forEach((idx, i) => {
-                const track = currentTracks[idx];
-                const name = track.name.replace(/\.[^/.]+$/, "");
-                html += `
-                    <div class="queue-item ${currentTrackIndex === idx ? 'playing' : ''}">
-                        <span class="queue-number">${i+1}</span>
-                        <div class="queue-item-info">
-                            <div class="queue-item-name">${name}</div>
-                            <div class="queue-item-artist">Из папки music</div>
-                        </div>
-                        <div class="queue-remove" onclick="removeFromQueue(${i})">✕</div>
-                    </div>
-                `;
-            });
-            queueItems.innerHTML = html;
-        }
-
-        function toggleQueue() {
-            document.getElementById('queuePanel').classList.toggle('open');
-            updateQueueDisplay();
-        }
-
-        // ==================== ЛЮБИМОЕ ====================
-        function toggleFavorite(url) {
-            const idx = favorites.indexOf(url);
-            if (idx === -1) {
-                favorites.push(url);
-                showNotification('❤️', 'Добавлено в любимое');
-            } else {
-                favorites.splice(idx, 1);
-                showNotification('💔', 'Удалено из любимого');
-            }
-            localStorage.setItem('favorites', JSON.stringify(favorites));
-            
-            const active = document.querySelector('.nav-item.active');
-            if (active) {
-                if (active.textContent.includes('Главная')) showHomePage();
-                else if (active.textContent.includes('Любимое')) showFavoritesPage();
-                else if (active.textContent.includes('Все треки')) showAllTracksPage();
-            }
-        }
-
-        // ==================== СТАТИСТИКА ====================
-        function checkStats() {
-            const today = new Date().toDateString();
-            if (stats.date !== today) {
-                stats.week += stats.today;
-                stats.today = 0;
-                stats.date = today;
-                localStorage.setItem('stats', JSON.stringify(stats));
-            }
-        }
-
-        function updateStats(minutes) {
-            stats.today += minutes;
-            stats.week += minutes;
-            stats.total += minutes;
-            localStorage.setItem('stats', JSON.stringify(stats));
-            updateStatsDisplay();
-        }
-
-        function updateStatsDisplay() {
-            document.getElementById('todayStats').textContent = Math.round(stats.today);
-            document.getElementById('totalStats').textContent = Math.round(stats.total);
-            if (document.getElementById('fullStatToday')) {
-                document.getElementById('fullStatToday').textContent = Math.round(stats.today);
-                document.getElementById('fullStatWeek').textContent = Math.round(stats.week);
-                document.getElementById('fullStatTotal').textContent = Math.round(stats.total);
-            }
-        }
-
-        // ==================== ПРОФИЛЬ ====================
-        function openFullProfile() {
-            profileFull.classList.add('open');
-            updateStatsDisplay();
-            switchProfileTab('favorites');
-        }
-
-        function closeFullProfile() {
-            profileFull.classList.remove('open');
-        }
-
-        function switchProfileTab(tab, el) {
-            document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
-            if (el) el.classList.add('active');
-
-            const favTracks = currentTracks.filter(t => favorites.includes(t.download_url));
-            
-            if (tab === 'favorites') {
-                let html = '<div class="favorites-grid">';
-                favTracks.slice(0, 20).forEach(t => {
-                    const name = t.name.replace(/\.[^/.]+$/, "");
-                    const idx = currentTracks.findIndex(tr => tr.download_url === t.download_url);
-                    html += `
-                        <div class="favorite-card" onclick="playTrack(${idx})">
-                            <div class="favorite-card-icon">🎵</div>
-                            <div class="favorite-card-info">
-                                <div class="favorite-card-name">${name}</div>
-                                <div class="favorite-card-artist">Из папки music</div>
-                            </div>
-                            <div class="favorite-card-play">▶</div>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                if (favTracks.length === 0) html = '<div style="text-align: center; padding: 40px;">Нет любимых треков</div>';
-                document.getElementById('profileContent').innerHTML = html;
-            } else if (tab === 'recent') {
-                document.getElementById('profileContent').innerHTML = '<div style="text-align: center; padding: 40px;">🕒 История прослушиваний появится скоро</div>';
-            } else if (tab === 'stats') {
-                document.getElementById('profileContent').innerHTML = `
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; text-align: center;">
-                            <div style="font-size: 48px; color: #FC0;">${Math.round(stats.today)}</div>
-                            <div style="color: #B3B3B3;">Минут сегодня</div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; text-align: center;">
-                            <div style="font-size: 48px; color: #FC0;">${Math.round(stats.week)}</div>
-                            <div style="color: #B3B3B3;">За неделю</div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; text-align: center; grid-column: span 2;">
-                            <div style="font-size: 64px; color: #FC0;">${Math.round(stats.total)}</div>
-                            <div style="color: #B3B3B3;">Всего минут</div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; text-align: center;">
-                            <div style="font-size: 48px; color: #FC0;">${currentTracks.length}</div>
-                            <div style="color: #B3B3B3;">Всего треков</div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; text-align: center;">
-                            <div style="font-size: 48px; color: #FC0;">${favorites.length}</div>
-                            <div style="color: #B3B3B3;">В любимом</div>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
         // ==================== УВЕДОМЛЕНИЯ ====================
         function showNotification(title, msg) {
             notificationTitle.textContent = title;
@@ -2235,6 +2484,49 @@
             isMuted = !isMuted;
             volumeBar.style.width = currentVolume + '%';
         }
+
+        // ==================== ЗАПУСК ====================
+        window.addEventListener('DOMContentLoaded', () => {
+            loadMusic();
+            checkStats();
+            updateStatsDisplay();
+            loadSettings();
+            
+            document.addEventListener('click', function initOnClick() {
+                if (!isAudioInitialized) {
+                    initAudioContext();
+                }
+                document.removeEventListener('click', initOnClick);
+            }, { once: true });
+        });
+
+        function loadSettings() {
+            bassSlider.value = bassBoost;
+            bassValue.textContent = bassBoost + ' dB';
+            updateBassButtonColor();
+        }
+
+        audio.addEventListener('play', async () => {
+            isPlaying = true;
+            playPauseBtn.innerHTML = '⏸';
+            
+            if (!isAudioInitialized) {
+                await initAudioContext();
+            }
+            
+            if (audioContext && audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+        });
+        
+        audio.addEventListener('pause', () => {
+            isPlaying = false;
+            playPauseBtn.innerHTML = '▶';
+        });
+        
+        audio.addEventListener('timeupdate', updateProgress);
+        audio.addEventListener('loadedmetadata', updateDuration);
+        audio.addEventListener('ended', nextTrack);
     </script>
 </body>
 </html>
