@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Моя музыка</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        h1 { text-align: center; margin-top: 0; }
+        audio {
+            width: 100%;
+            margin: 20px 0;
+            border-radius: 30px;
+        }
+        .playlist {
+            list-style: none;
+            padding: 0;
+        }
+        .playlist li {
+            padding: 15px;
+            margin: 5px 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        .playlist li:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateX(5px);
+        }
+        .playlist li.playing {
+            background: rgba(255,255,255,0.4);
+            border-left: 5px solid #ffd700;
+        }
+        .playlist li::before {
+            content: '🎵';
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎶 Мой плеер</h1>
+        
+        <!-- Элемент аудио -->
+        <audio id="audio-player" controls></audio>
+        
+        <h2>Плейлист</h2>
+        <ul class="playlist" id="playlist">
+            <!-- Сюда js подгрузит треки -->
+        </ul>
+        
+        <p style="text-align: center; color: #ddd; font-size: 0.9em;">
+            Положи свои MP3 в папку "music" рядом с этим файлом.
+        </p>
+    </div>
+
+    <script>
+        // Список песен (ты можешь дописать свои)
+        const tracks = [
+            { name: "Мой первый трек", file: "music/song1.mp3" },
+            { name: "Летний хит", file: "music/song2.mp3" },
+            { name: "Спокойный вечер", file: "music/song3.mp3" }
+        ];
+
+        const audioPlayer = document.getElementById('audio-player');
+        const playlistEl = document.getElementById('playlist');
+
+        function loadPlaylist() {
+            playlistEl.innerHTML = '';
+            tracks.forEach((track, index) => {
+                const li = document.createElement('li');
+                li.textContent = track.name;
+                li.dataset.index = index;
+                li.dataset.src = track.file;
+                
+                li.addEventListener('click', function() {
+                    playTrack(this);
+                });
+                
+                playlistEl.appendChild(li);
+            });
+        }
+
+        function playTrack(element) {
+            // Убираем класс "playing" у всех
+            document.querySelectorAll('.playlist li').forEach(li => {
+                li.classList.remove('playing');
+            });
+            
+            // Добавляем класс текущему треку
+            element.classList.add('playing');
+            
+            // Проигрываем
+            audioPlayer.src = element.dataset.src;
+            audioPlayer.play();
+        }
+
+        // Загружаем список
+        loadPlaylist();
+        
+        // Если хочешь авто-загрузку первого трека
+        // if (tracks.length > 0) {
+        //     playTrack(document.querySelector('.playlist li'));
+        // }
+    </script>
+</body>
+</html>
