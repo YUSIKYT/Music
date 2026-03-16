@@ -2,125 +2,282 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Моя музыка</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        * {
             margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        }
-        h1 { text-align: center; margin-top: 0; }
-        audio {
-            width: 100%;
-            margin: 20px 0;
-            border-radius: 30px;
-        }
-        .playlist {
-            list-style: none;
             padding: 0;
+            box-sizing: border-box;
         }
-        .playlist li {
-            padding: 15px;
-            margin: 5px 0;
-            background: rgba(255,255,255,0.2);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.3s;
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4a00e0 0%, #8e2de2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .music-list {
+            padding: 30px;
+        }
+
+        .song-item {
             display: flex;
             align-items: center;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .playlist li:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateX(5px);
+
+        .song-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
-        .playlist li.playing {
-            background: rgba(255,255,255,0.4);
-            border-left: 5px solid #ffd700;
+
+        .song-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            color: white;
+            font-size: 24px;
         }
-        .playlist li::before {
-            content: '🎵';
-            margin-right: 10px;
+
+        .song-info {
+            flex: 1;
+        }
+
+        .song-name {
             font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            word-break: break-all;
+        }
+
+        .song-meta {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .audio-player {
+            width: 300px;
+            margin-left: 20px;
+        }
+
+        audio {
+            width: 100%;
+            height: 40px;
+            border-radius: 20px;
+        }
+
+        audio::-webkit-media-controls-panel {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .no-music {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        .no-music p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        .no-music .emoji {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #666;
+            border-top: 1px solid #eee;
+        }
+
+        .footer a {
+            color: #764ba2;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .song-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .song-icon {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+
+            .audio-player {
+                width: 100%;
+                margin-left: 0;
+                margin-top: 15px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎶 Мой плеер</h1>
-        
-        <!-- Элемент аудио -->
-        <audio id="audio-player" controls></audio>
-        
-        <h2>Плейлист</h2>
-        <ul class="playlist" id="playlist">
-            <!-- Сюда js подгрузит треки -->
-        </ul>
-        
-        <p style="text-align: center; color: #ddd; font-size: 0.9em;">
-            Положи свои MP3 в папку "music" рядом с этим файлом.
-        </p>
+        <div class="header">
+            <h1>🎵 Моя музыка</h1>
+            <p>Все треки из папки music</p>
+        </div>
+
+        <div class="music-list" id="musicList">
+            <div class="loading" style="text-align: center; padding: 50px;">
+                <div class="emoji" style="font-size: 3em;">⏳</div>
+                <p>Загрузка музыки...</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>📁 Добавьте файлы в папку <strong>music</strong> на GitHub</p>
+            <p>Сайт обновляется автоматически</p>
+        </div>
     </div>
 
     <script>
-        // Список песен (ты можешь дописать свои)
-        const tracks = [
-            { name: "Мой первый трек", file: "music/song1.mp3" },
-            { name: "Летний хит", file: "music/song2.mp3" },
-            { name: "Спокойный вечер", file: "music/song3.mp3" }
-        ];
-
-        const audioPlayer = document.getElementById('audio-player');
-        const playlistEl = document.getElementById('playlist');
-
-        function loadPlaylist() {
-            playlistEl.innerHTML = '';
-            tracks.forEach((track, index) => {
-                const li = document.createElement('li');
-                li.textContent = track.name;
-                li.dataset.index = index;
-                li.dataset.src = track.file;
+        async function loadMusic() {
+            const musicList = document.getElementById('musicList');
+            
+            try {
+                // Получаем список файлов из папки music через GitHub API
+                const response = await fetch('https://api.github.com/repos/YUSIKYT/music-player/contents/music');
                 
-                li.addEventListener('click', function() {
-                    playTrack(this);
+                if (!response.ok) {
+                    throw new Error('Не удалось загрузить список музыки');
+                }
+
+                const files = await response.json();
+                
+                if (files.length === 0) {
+                    musicList.innerHTML = `
+                        <div class="no-music">
+                            <div class="emoji">🎧</div>
+                            <p>В папке music пока нет файлов</p>
+                            <p style="font-size: 0.9em;">Добавьте аудиофайлы в папку music на GitHub</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Фильтруем только аудиофайлы
+                const audioFiles = files.filter(file => {
+                    const ext = file.name.split('.').pop().toLowerCase();
+                    return ['mp3', 'wav', 'ogg', 'm4a', 'aac', 'flac'].includes(ext);
                 });
+
+                if (audioFiles.length === 0) {
+                    musicList.innerHTML = `
+                        <div class="no-music">
+                            <div class="emoji">🎵</div>
+                            <p>В папке music нет аудиофайлов</p>
+                            <p style="font-size: 0.9em;">Поддерживаемые форматы: MP3, WAV, OGG, M4A, AAC, FLAC</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Создаем список песен
+                let songsHTML = '';
                 
-                playlistEl.appendChild(li);
-            });
+                audioFiles.forEach((file, index) => {
+                    // Форматируем имя файла (убираем расширение)
+                    const songName = file.name.replace(/\.[^/.]+$/, "");
+                    
+                    // Получаем URL для скачивания
+                    const audioUrl = file.download_url;
+                    
+                    songsHTML += `
+                        <div class="song-item">
+                            <div class="song-icon">
+                                ${index + 1}
+                            </div>
+                            <div class="song-info">
+                                <div class="song-name">${songName}</div>
+                                <div class="song-meta">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
+                            </div>
+                            <div class="audio-player">
+                                <audio controls preload="metadata">
+                                    <source src="${audioUrl}" type="audio/mpeg">
+                                    Ваш браузер не поддерживает аудио элемент.
+                                </audio>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                musicList.innerHTML = songsHTML;
+
+            } catch (error) {
+                console.error('Ошибка:', error);
+                musicList.innerHTML = `
+                    <div class="no-music">
+                        <div class="emoji">❌</div>
+                        <p>Ошибка загрузки музыки</p>
+                        <p style="font-size: 0.9em; color: #ff4444;">${error.message}</p>
+                        <p style="font-size: 0.9em; margin-top: 20px;">Проверьте, что:</p>
+                        <ul style="list-style: none; font-size: 0.9em;">
+                            <li>✓ Репозиторий называется "YUSIKYT/music-player"</li>
+                            <li>✓ Папка "music" существует</li>
+                            <li>✓ В папке есть аудиофайлы</li>
+                        </ul>
+                    </div>
+                `;
+            }
         }
 
-        function playTrack(element) {
-            // Убираем класс "playing" у всех
-            document.querySelectorAll('.playlist li').forEach(li => {
-                li.classList.remove('playing');
-            });
-            
-            // Добавляем класс текущему треку
-            element.classList.add('playing');
-            
-            // Проигрываем
-            audioPlayer.src = element.dataset.src;
-            audioPlayer.play();
-        }
-
-        // Загружаем список
-        loadPlaylist();
-        
-        // Если хочешь авто-загрузку первого трека
-        // if (tracks.length > 0) {
-        //     playTrack(document.querySelector('.playlist li'));
-        // }
+        // Загружаем музыку при загрузке страницы
+        window.addEventListener('DOMContentLoaded', loadMusic);
     </script>
 </body>
 </html>
