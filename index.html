@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoundNode — музыкальный плеер</title>
+    <title>SoundNode — басс буст и профиль</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +19,6 @@
             background: linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%);
         }
 
-        /* Главный контейнер */
         .app {
             display: flex;
             min-height: 100vh;
@@ -607,56 +606,243 @@
             border-color: #FC0;
         }
 
-        /* Панель баса */
-        .bass-panel {
-            position: absolute;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.9);
+        /* Панель настроек */
+        .settings-panel {
+            position: fixed;
+            right: 30px;
+            top: 100px;
+            width: 380px;
+            background: rgba(20, 20, 20, 0.95);
             backdrop-filter: blur(10px);
-            border: 1px solid #FC0;
-            border-radius: 40px;
-            padding: 15px 30px;
-            display: none;
-            align-items: center;
-            gap: 25px;
-            z-index: 200;
-            box-shadow: 0 10px 30px rgba(255, 204, 0, 0.3);
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            border-radius: 24px;
+            padding: 24px;
+            z-index: 1000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            transform: translateX(420px);
+            transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+            border-top: 3px solid #FC0;
         }
 
-        .bass-panel.open {
+        .settings-panel.open {
+            transform: translateX(0);
+        }
+
+        .settings-header {
             display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 204, 0, 0.2);
         }
 
-        .bass-panel span {
+        .settings-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #FC0, #FFA500);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #000;
+            box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
+        }
+
+        .settings-title {
+            font-size: 20px;
+            font-weight: 700;
             color: #FC0;
-            font-size: 16px;
+        }
+
+        .settings-subtitle {
+            font-size: 12px;
+            color: #B3B3B3;
+        }
+
+        .settings-close {
+            margin-left: auto;
+            cursor: pointer;
+            color: #B3B3B3;
+            font-size: 22px;
+            transition: all 0.3s;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .settings-close:hover {
+            background: rgba(255, 204, 0, 0.2);
+            color: #FC0;
+            transform: rotate(90deg);
+        }
+
+        .settings-section {
+            margin-bottom: 28px;
+        }
+
+        .settings-section-title {
+            color: #FC0;
+            font-size: 14px;
             font-weight: 600;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .bass-panel input {
-            width: 280px;
-            height: 6px;
+        .settings-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding: 8px 0;
+        }
+
+        .settings-item-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #fff;
+            font-size: 15px;
+        }
+
+        .settings-item-label span {
+            font-size: 20px;
+            width: 28px;
+        }
+
+        /* Басс буст - теперь реальный */
+        .bass-boost-container {
+            background: rgba(255, 204, 0, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+        }
+
+        .bass-boost-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .bass-boost-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #FC0;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .bass-boost-value {
+            color: #FC0;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .bass-boost-slider {
+            width: 100%;
+            height: 8px;
             -webkit-appearance: none;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
             outline: none;
+            margin: 15px 0;
         }
 
-        .bass-panel input::-webkit-slider-thumb {
+        .bass-boost-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             background: #FC0;
             border-radius: 50%;
             cursor: pointer;
-            box-shadow: 0 0 15px #FC0;
+            box-shadow: 0 0 20px #FC0;
+            border: 2px solid #fff;
         }
 
-        .bass-value {
-            color: #FC0 !important;
-            font-size: 18px !important;
+        .bass-boost-presets {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .bass-preset {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            border-radius: 20px;
+            padding: 8px 4px;
+            text-align: center;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #B3B3B3;
+        }
+
+        .bass-preset:hover {
+            background: #FC0;
+            color: #000;
+            border-color: #FC0;
+            transform: scale(1.05);
+        }
+
+        .bass-preset.active {
+            background: #FC0;
+            color: #000;
+        }
+
+        /* Индикатор баса в плеере */
+        .bass-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 10px;
+        }
+
+        .bass-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #B3B3B3;
+            transition: all 0.3s;
+        }
+
+        .bass-dot.active {
+            background: #FC0;
+            box-shadow: 0 0 10px #FC0;
+        }
+
+        /* Кнопка в профиле */
+        .profile-button {
+            position: fixed;
+            bottom: 120px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FC0, #FFA500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 28px;
+            color: #000;
+            box-shadow: 0 6px 20px rgba(255, 204, 0, 0.5);
+            z-index: 90;
+            transition: all 0.3s;
+            border: 2px solid #fff;
+        }
+
+        .profile-button:hover {
+            transform: scale(1.15) rotate(10deg);
+            box-shadow: 0 10px 30px rgba(255, 204, 0, 0.8);
         }
 
         /* Очередь */
@@ -757,7 +943,7 @@
         .queue-toggle {
             position: fixed;
             right: 30px;
-            bottom: 220px;
+            bottom: 200px;
             width: 55px;
             height: 55px;
             border-radius: 50%;
@@ -809,7 +995,7 @@
             color: #B3B3B3;
         }
 
-        /* Профиль (полноэкранный) */
+        /* Профиль */
         .profile-full {
             position: fixed;
             top: 0;
@@ -964,6 +1150,7 @@
             background: rgba(255, 255, 255, 0.03);
             border-radius: 12px;
             transition: all 0.3s;
+            cursor: pointer;
         }
 
         .favorite-card:hover {
@@ -1015,10 +1202,23 @@
             opacity: 1;
         }
 
-        /* Адаптация */
         @media (max-width: 1024px) {
             .track-album, .track-header-album {
                 display: none;
+            }
+            
+            .settings-panel {
+                width: calc(100% - 40px);
+                right: 20px;
+                top: 80px;
+            }
+            
+            .profile-button {
+                right: 20px;
+                bottom: 100px;
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
             }
         }
     </style>
@@ -1047,6 +1247,10 @@
             <div class="nav-item" onclick="showPage('playlists', this)">
                 <span class="nav-icon">📋</span>
                 Плейлисты
+            </div>
+            <div class="nav-item" onclick="toggleSettings()">
+                <span class="nav-icon">⚙️</span>
+                Настройки
             </div>
 
             <div class="playlist-section">
@@ -1077,7 +1281,59 @@
 
             <!-- Контент -->
             <div class="content" id="content">
-                <!-- Сюда будет загружаться контент -->
+                <!-- Заглушка загрузки -->
+                <div style="text-align: center; padding: 100px; color: #B3B3B3;">
+                    <div style="font-size: 48px; margin-bottom: 20px;">⏳</div>
+                    <div>Загрузка музыки из папки music...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Кнопка профиля (новая!) -->
+        <div class="profile-button" onclick="openFullProfile()" title="Мой профиль">
+            👤
+        </div>
+
+        <!-- Панель настроек -->
+        <div class="settings-panel" id="settingsPanel">
+            <div class="settings-header">
+                <div class="settings-icon">⚙️</div>
+                <div>
+                    <div class="settings-title">Настройки звука</div>
+                    <div class="settings-subtitle">Басс буст · Эквалайзер</div>
+                </div>
+                <div class="settings-close" onclick="toggleSettings()">✕</div>
+            </div>
+
+            <!-- РЕАЛЬНЫЙ БАСС БУСТ -->
+            <div class="settings-section">
+                <div class="settings-section-title">🔊 БАСС БУСТ (РЕАЛЬНЫЙ)</div>
+                <div class="bass-boost-container">
+                    <div class="bass-boost-header">
+                        <div class="bass-boost-title">
+                            <span>🔊</span> Усиление низких частот
+                        </div>
+                        <div class="bass-boost-value" id="bassValue">0 dB</div>
+                    </div>
+                    <input type="range" class="bass-boost-slider" id="bassSlider" min="0" max="20" value="0" step="1">
+                    <div class="bass-boost-presets">
+                        <div class="bass-preset" onclick="setBassPreset(0)">🔇 Выкл</div>
+                        <div class="bass-preset" onclick="setBassPreset(5)">🔈 Легкий</div>
+                        <div class="bass-preset" onclick="setBassPreset(10)">🔉 Средний</div>
+                        <div class="bass-preset" onclick="setBassPreset(15)">🔊 Сильный</div>
+                        <div class="bass-preset" onclick="setBassPreset(20)">💥 Макс</div>
+                    </div>
+                    <div style="margin-top: 15px; font-size: 12px; color: #FC0; text-align: center;">
+                        ⚡ Реальный басс буст через Web Audio API
+                    </div>
+                </div>
+            </div>
+
+            <!-- Индикатор баса в плеере -->
+            <div class="bass-indicator" id="bassIndicator" style="display: none;">
+                <span class="bass-dot"></span>
+                <span class="bass-dot"></span>
+                <span class="bass-dot"></span>
             </div>
         </div>
 
@@ -1090,7 +1346,7 @@
                 <h3>Очередь воспроизведения</h3>
                 <div class="queue-close" onclick="toggleQueue()">✕</div>
             </div>
-            <div id="queueItems"></div>
+            <div id="queueItems">Очередь пуста</div>
         </div>
 
         <!-- Уведомление -->
@@ -1099,14 +1355,7 @@
             <div class="notification-message" id="notificationMessage"></div>
         </div>
 
-        <!-- Панель баса -->
-        <div class="bass-panel" id="bassPanel">
-            <span>🔊 BASS</span>
-            <input type="range" id="bassSlider" min="-20" max="20" value="0" step="1" oninput="updateBass()">
-            <span class="bass-value" id="bassValue">0 dB</span>
-        </div>
-
-        <!-- ПОЛНОЭКРАННЫЙ ПРОФИЛЬ -->
+        <!-- Полноэкранный профиль -->
         <div class="profile-full" id="profileFull">
             <div class="profile-close-full" onclick="closeFullProfile()">✕</div>
             
@@ -1114,7 +1363,7 @@
                 <div class="profile-avatar-full">👤</div>
                 <div class="profile-info-full">
                     <h1>Мой профиль</h1>
-                    <p>SoundNode • Музыкальный энтузиаст</p>
+                    <p>SoundNode · Музыкальный энтузиаст</p>
                 </div>
             </div>
 
@@ -1140,12 +1389,11 @@
             </div>
 
             <div class="profile-content" id="profileContent">
-                <!-- Сюда будут загружаться треки -->
+                <!-- Контент профиля -->
             </div>
         </div>
 
-        <!-- Оверлей для профиля (не нужен, так как полноэкранный) -->
-        <div class="overlay" id="overlay" onclick="closeFullProfile()" style="display: none;"></div>
+        <div class="overlay" id="overlay" onclick="closeFullProfile()"></div>
 
         <!-- Плеер -->
         <div class="player-bar">
@@ -1164,7 +1412,7 @@
                     <button class="control-btn play-pause" id="playPauseBtn" onclick="togglePlayPause()">▶</button>
                     <button class="control-btn" onclick="toggleRepeat()" id="repeatBtn">🔁</button>
                     <button class="control-btn" onclick="nextTrack()">⏭</button>
-                    <button class="bass-btn control-btn" id="bassBtn" onclick="toggleBassPanel()">🔊</button>
+                    <button class="control-btn" id="bassBtn" onclick="toggleSettings()" style="color: #B3B3B3;">🔊</button>
                     <div class="speed-btn" onclick="changeSpeed()" id="speedBtn">1x</div>
                 </div>
                 
@@ -1189,7 +1437,7 @@
     </div>
 
     <script>
-        // Данные
+        // ==================== ПЕРЕМЕННЫЕ ====================
         let currentTracks = [];
         let currentTrackIndex = -1;
         let isPlaying = false;
@@ -1202,22 +1450,24 @@
         let queue = [];
         let currentSpeed = 1;
         let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-        let recentTracks = JSON.parse(localStorage.getItem('recent')) || [];
+        
+        // Настройки баса
+        let bassBoost = parseInt(localStorage.getItem('bassBoost')) || 0;
+        
+        // Web Audio API
+        let audioContext = null;
+        let sourceNode = null;
+        let bassFilter = null;
+        let isAudioInitialized = false;
         
         // Статистика
         let stats = JSON.parse(localStorage.getItem('stats')) || { 
-            today: 0, 
-            week: 0, 
-            total: 0, 
+            today: 0, week: 0, total: 0, 
             date: new Date().toDateString(),
             lastWeek: new Date().toDateString()
         };
 
-        // Для подсчета времени
-        let listenStartTime = null;
-        let listenInterval = null;
-
-        // Элементы
+        // ==================== ЭЛЕМЕНТЫ ====================
         const audio = document.getElementById('audioPlayer');
         const playPauseBtn = document.getElementById('playPauseBtn');
         const currentTrackName = document.getElementById('currentTrackName');
@@ -1232,89 +1482,174 @@
         const repeatBtn = document.getElementById('repeatBtn');
         const shuffleBtn = document.getElementById('shuffleBtn');
         const speedBtn = document.getElementById('speedBtn');
+        const content = document.getElementById('content');
         const notification = document.getElementById('notification');
         const notificationTitle = document.getElementById('notificationTitle');
         const notificationMessage = document.getElementById('notificationMessage');
+        const profileFull = document.getElementById('profileFull');
         const bassBtn = document.getElementById('bassBtn');
-        const bassPanel = document.getElementById('bassPanel');
+        
+        // Элементы настроек
+        const settingsPanel = document.getElementById('settingsPanel');
         const bassSlider = document.getElementById('bassSlider');
         const bassValue = document.getElementById('bassValue');
-        const content = document.getElementById('content');
-        const profileFull = document.getElementById('profileFull');
 
-        // Прокси для обхода CORS
-        const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
+        // ==================== ИНИЦИАЛИЗАЦИЯ AUDIO CONTEXT ====================
+        async function initAudioContext() {
+            if (isAudioInitialized) return;
+            
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Создаем фильтр баса
+                bassFilter = audioContext.createBiquadFilter();
+                bassFilter.type = 'lowshelf';
+                bassFilter.frequency.value = 150;
+                bassFilter.gain.value = bassBoost;
+                
+                // Подключаем аудио элемент
+                sourceNode = audioContext.createMediaElementSource(audio);
+                sourceNode.connect(bassFilter);
+                bassFilter.connect(audioContext.destination);
+                
+                isAudioInitialized = true;
+                console.log('AudioContext инициализирован, басс буст:', bassBoost);
+                
+                // Обновляем цвет кнопки
+                updateBassButtonColor();
+                
+            } catch (e) {
+                console.warn('Web Audio API не поддерживается', e);
+                showNotification('Ошибка', 'Басс буст не поддерживается в вашем браузере');
+            }
+        }
 
-        // Загрузка
+        // Функция для обновления баса в реальном времени
+        function updateBassFilter() {
+            if (bassFilter) {
+                bassFilter.gain.value = bassBoost;
+                console.log('Басс буст обновлен:', bassBoost);
+                updateBassButtonColor();
+            }
+        }
+
+        // Обновление цвета кнопки баса
+        function updateBassButtonColor() {
+            if (bassBoost > 0) {
+                bassBtn.style.color = '#FC0';
+                // Добавляем анимацию
+                bassBtn.style.transform = 'scale(1.2)';
+                setTimeout(() => bassBtn.style.transform = 'scale(1)', 200);
+            } else {
+                bassBtn.style.color = '#B3B3B3';
+            }
+        }
+
+        // ==================== ЗАГРУЗКА ====================
         window.addEventListener('DOMContentLoaded', () => {
             loadMusic();
             checkStats();
             updateStatsDisplay();
+            loadSettings();
+            
+            // Инициализируем AudioContext при первом взаимодействии
+            document.addEventListener('click', function initOnClick() {
+                if (!isAudioInitialized) {
+                    initAudioContext();
+                }
+                document.removeEventListener('click', initOnClick);
+            }, { once: true });
         });
 
+        function loadSettings() {
+            // Загружаем сохраненные настройки
+            bassSlider.value = bassBoost;
+            bassValue.textContent = bassBoost + ' dB';
+            updateBassButtonColor();
+        }
+
         // События аудио
-        audio.addEventListener('timeupdate', updateProgress);
-        audio.addEventListener('loadedmetadata', updateDuration);
-        audio.addEventListener('ended', nextTrack);
-        audio.addEventListener('error', (e) => {
-            console.error('Ошибка аудио:', e);
-            showNotification('Ошибка', 'Не удалось воспроизвести трек');
-        });
-        
-        audio.addEventListener('play', () => {
+        audio.addEventListener('play', async () => {
             isPlaying = true;
             playPauseBtn.innerHTML = '⏸';
-            startListenTimer();
+            
+            // Инициализируем AudioContext при первом воспроизведении
+            if (!isAudioInitialized) {
+                await initAudioContext();
+            }
+            
+            // Возобновляем контекст если он приостановлен
+            if (audioContext && audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
         });
         
         audio.addEventListener('pause', () => {
             isPlaying = false;
             playPauseBtn.innerHTML = '▶';
-            stopListenTimer();
+        });
+        
+        audio.addEventListener('timeupdate', updateProgress);
+        audio.addEventListener('loadedmetadata', updateDuration);
+        audio.addEventListener('ended', nextTrack);
+
+        // ==================== НАСТРОЙКИ ====================
+        function toggleSettings() {
+            settingsPanel.classList.toggle('open');
+        }
+
+        // Басс буст - реальный!
+        bassSlider.addEventListener('input', function(e) {
+            const val = parseInt(e.target.value);
+            bassValue.textContent = val + ' dB';
+            bassBoost = val;
+            localStorage.setItem('bassBoost', bassBoost);
+            
+            // Обновляем фильтр в реальном времени
+            if (bassFilter) {
+                bassFilter.gain.value = val;
+                console.log('Басс буст изменен:', val);
+            } else if (isAudioInitialized) {
+                // Если фильтр не создан, но контекст инициализирован
+                updateBassFilter();
+            }
+            
+            updateBassButtonColor();
+            
+            // Показываем уведомление
+            if (val > 0) {
+                showNotification('🔊 Басс буст', `Усиление ${val} dB`);
+            }
         });
 
-        // Таймер прослушивания
-        function startListenTimer() {
-            listenStartTime = Date.now();
-            if (listenInterval) clearInterval(listenInterval);
-            listenInterval = setInterval(() => {
-                if (isPlaying && listenStartTime) {
-                    const minutes = Math.floor((Date.now() - listenStartTime) / 60000);
-                    if (minutes > 0) {
-                        updateStats(minutes);
-                        listenStartTime = Date.now();
-                    }
-                }
-            }, 60000);
-        }
-
-        function stopListenTimer() {
-            if (listenInterval) {
-                clearInterval(listenInterval);
-                listenInterval = null;
-            }
-            listenStartTime = null;
-        }
-
-        // Навигация
-        function showPage(page, element) {
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
+        function setBassPreset(val) {
+            bassSlider.value = val;
+            bassValue.textContent = val + ' dB';
+            bassBoost = val;
+            localStorage.setItem('bassBoost', bassBoost);
             
-            if (element) {
-                element.classList.add('active');
+            if (bassFilter) {
+                bassFilter.gain.value = val;
             }
+            
+            updateBassButtonColor();
+            
+            if (val === 0) {
+                showNotification('🔇 Басс буст', 'Выключен');
+            } else {
+                showNotification('🔊 Басс буст', `Установлен на ${val} dB`);
+            }
+        }
 
-            if (page === 'home') {
-                showHomePage();
-            } else if (page === 'favorites') {
-                showFavoritesPage();
-            } else if (page === 'all') {
-                showAllTracksPage();
-            } else if (page === 'playlists') {
-                showPlaylistsPage();
-            }
+        // ==================== НАВИГАЦИЯ ====================
+        function showPage(page, element) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            if (element) element.classList.add('active');
+
+            if (page === 'home') showHomePage();
+            else if (page === 'favorites') showFavoritesPage();
+            else if (page === 'all') showAllTracksPage();
+            else if (page === 'playlists') showPlaylistsPage();
         }
 
         function showHomePage() {
@@ -1325,8 +1660,8 @@
 
             let html = `
                 <div class="welcome">
-                    <h1>Добро пожаловать в SoundNode</h1>
-                    <p>Ваши треки из папки music</p>
+                    <h1>⚡ SoundNode с басс бустом</h1>
+                    <p>Твоя музыка с реальным усилением баса</p>
                 </div>
 
                 <div class="grid">
@@ -1340,15 +1675,15 @@
                         <div class="card-title">Любимое</div>
                         <div class="card-artist">${favorites.length} треков</div>
                     </div>
+                    <div class="card" onclick="toggleSettings()">
+                        <div class="card-image">⚙️</div>
+                        <div class="card-title">Басс буст</div>
+                        <div class="card-artist">${bassBoost} dB</div>
+                    </div>
                     <div class="card" onclick="openFullProfile()">
                         <div class="card-image">👤</div>
-                        <div class="card-title">Мой профиль</div>
-                        <div class="card-artist">Статистика и треки</div>
-                    </div>
-                    <div class="card">
-                        <div class="card-image">⭐</div>
-                        <div class="card-title">Рекомендации</div>
-                        <div class="card-artist">Скоро</div>
+                        <div class="card-title">Профиль</div>
+                        <div class="card-artist">Статистика</div>
                     </div>
                 </div>
 
@@ -1401,10 +1736,7 @@
         }
 
         function showFavoritesPage() {
-            if (currentTracks.length === 0) {
-                content.innerHTML = '<div style="text-align: center; padding: 50px;">Загрузка музыки...</div>';
-                return;
-            }
+            if (currentTracks.length === 0) return;
 
             const favoriteTracks = currentTracks.filter(t => favorites.includes(t.download_url));
             
@@ -1461,10 +1793,7 @@
         }
 
         function showAllTracksPage() {
-            if (currentTracks.length === 0) {
-                content.innerHTML = '<div style="text-align: center; padding: 50px;">Загрузка музыки...</div>';
-                return;
-            }
+            if (currentTracks.length === 0) return;
 
             let html = `
                 <div class="welcome">
@@ -1524,100 +1853,7 @@
             `;
         }
 
-        // ПОЛНОЭКРАННЫЙ ПРОФИЛЬ
-        function openFullProfile() {
-            profileFull.classList.add('open');
-            updateFullProfileStats();
-            switchProfileTab('favorites');
-        }
-
-        function closeFullProfile() {
-            profileFull.classList.remove('open');
-        }
-
-        function updateFullProfileStats() {
-            document.getElementById('fullStatToday').textContent = Math.round(stats.today);
-            document.getElementById('fullStatWeek').textContent = Math.round(stats.week);
-            document.getElementById('fullStatTotal').textContent = Math.round(stats.total);
-        }
-
-        function switchProfileTab(tab, element) {
-            document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
-            if (element) element.classList.add('active');
-            
-            const profileContent = document.getElementById('profileContent');
-            
-            if (tab === 'favorites') {
-                showFavoritesInProfile();
-            } else if (tab === 'recent') {
-                showRecentInProfile();
-            } else if (tab === 'stats') {
-                showStatsInProfile();
-            }
-        }
-
-        function showFavoritesInProfile() {
-            const favoriteTracks = currentTracks.filter(t => favorites.includes(t.download_url));
-            
-            if (favoriteTracks.length === 0) {
-                document.getElementById('profileContent').innerHTML = '<div style="text-align: center; padding: 50px; color: #B3B3B3;">Нет любимых треков</div>';
-                return;
-            }
-
-            let html = '<div class="favorites-grid">';
-            
-            favoriteTracks.forEach(track => {
-                const songName = track.name.replace(/\.[^/.]+$/, "");
-                const originalIndex = currentTracks.findIndex(t => t.download_url === track.download_url);
-                
-                html += `
-                    <div class="favorite-card" onclick="playTrack(${originalIndex})">
-                        <div class="favorite-card-icon">🎵</div>
-                        <div class="favorite-card-info">
-                            <div class="favorite-card-name">${songName}</div>
-                            <div class="favorite-card-artist">Из папки music</div>
-                        </div>
-                        <div class="favorite-card-play">▶</div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            document.getElementById('profileContent').innerHTML = html;
-        }
-
-        function showRecentInProfile() {
-            document.getElementById('profileContent').innerHTML = '<div style="text-align: center; padding: 50px; color: #B3B3B3;">Скоро здесь появится история</div>';
-        }
-
-        function showStatsInProfile() {
-            document.getElementById('profileContent').innerHTML = `
-                <div style="text-align: center; padding: 30px;">
-                    <div style="font-size: 60px; color: #FC0; margin-bottom: 20px;">📊</div>
-                    <h2 style="margin-bottom: 30px;">Детальная статистика</h2>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px;">
-                            <div style="font-size: 36px; color: #FC0;">${Math.round(stats.today)}</div>
-                            <div style="color: #B3B3B3;">Минут сегодня</div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px;">
-                            <div style="font-size: 36px; color: #FC0;">${Math.round(stats.week)}</div>
-                            <div style="color: #B3B3B3;">Минут за неделю</div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px;">
-                            <div style="font-size: 36px; color: #FC0;">${Math.round(stats.total)}</div>
-                            <div style="color: #B3B3B3;">Всего минут</div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px;">
-                            <div style="font-size: 36px; color: #FC0;">${favorites.length}</div>
-                            <div style="color: #B3B3B3;">Любимых треков</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Загрузка музыки
+        // ==================== ЗАГРУЗКА МУЗЫКИ ====================
         async function loadMusic() {
             try {
                 let response = await fetch('https://api.github.com/repos/YUSIKYT/Music/contents/music');
@@ -1626,9 +1862,7 @@
                     response = await fetch('https://api.github.com/repos/YUSIKYT/Music/contents/Music');
                 }
                 
-                if (!response.ok) {
-                    throw new Error('Папка music не найдена');
-                }
+                if (!response.ok) throw new Error('Папка music не найдена');
 
                 const files = await response.json();
                 
@@ -1654,8 +1888,8 @@
             }
         }
 
-        // Воспроизведение
-        function playTrack(index) {
+        // ==================== ВОСПРОИЗВЕДЕНИЕ ====================
+        async function playTrack(index) {
             if (index < 0 || index >= currentTracks.length) return;
             
             currentTrackIndex = index;
@@ -1666,35 +1900,27 @@
             currentTrackArtist.textContent = 'Из папки music';
             
             const rawUrl = track.download_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
-            const proxyUrl = CORS_PROXY + rawUrl;
-            
             audio.src = rawUrl;
-            audio.load();
-            
-            const playPromise = audio.play();
-            
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    audio.src = proxyUrl;
-                    audio.load();
-                    audio.play().catch(e => {
-                        console.error('Ошибка:', e);
-                        showNotification('Ошибка', 'Не удалось воспроизвести трек');
-                    });
-                });
-            }
-            
             audio.playbackRate = currentSpeed;
+            
+            try {
+                await audio.play();
+                
+                // Инициализируем AudioContext при первом воспроизведении
+                if (!isAudioInitialized) {
+                    await initAudioContext();
+                }
+                
+            } catch (e) {
+                console.log('Ошибка воспроизведения:', e);
+                showNotification('Ошибка', 'Не удалось воспроизвести трек');
+            }
             
             const activeNav = document.querySelector('.nav-item.active');
             if (activeNav) {
-                if (activeNav.textContent.includes('Главная')) {
-                    showHomePage();
-                } else if (activeNav.textContent.includes('Любимое')) {
-                    showFavoritesPage();
-                } else if (activeNav.textContent.includes('Все треки')) {
-                    showAllTracksPage();
-                }
+                if (activeNav.textContent.includes('Главная')) showHomePage();
+                else if (activeNav.textContent.includes('Любимое')) showFavoritesPage();
+                else if (activeNav.textContent.includes('Все треки')) showAllTracksPage();
             }
             
             showNotification('Сейчас играет', songName);
@@ -1706,11 +1932,8 @@
                 return;
             }
             
-            if (isPlaying) {
-                audio.pause();
-            } else {
-                audio.play().catch(e => console.log('Ошибка воспроизведения:', e));
-            }
+            if (isPlaying) audio.pause();
+            else audio.play();
         }
 
         function nextTrack() {
@@ -1725,7 +1948,7 @@
             
             if (repeatMode === 'one') {
                 audio.currentTime = 0;
-                audio.play().catch(e => console.log('Ошибка воспроизведения:', e));
+                audio.play();
                 return;
             }
             
@@ -1741,11 +1964,8 @@
                 nextIndex = (currentTrackIndex + 1) % currentTracks.length;
             }
             
-            if (repeatMode === 'all' || nextIndex !== 0) {
-                playTrack(nextIndex);
-            } else {
-                audio.pause();
-            }
+            if (repeatMode === 'all' || nextIndex !== 0) playTrack(nextIndex);
+            else audio.pause();
         }
 
         function prevTrack() {
@@ -1799,22 +2019,7 @@
             showNotification('Скорость', currentSpeed + 'x');
         }
 
-        // Бас
-        function toggleBassPanel() {
-            bassPanel.classList.toggle('open');
-        }
-
-        function updateBass() {
-            const gain = parseInt(bassSlider.value);
-            bassValue.textContent = gain + ' dB';
-            if (gain !== 0) {
-                bassBtn.classList.add('active');
-            } else {
-                bassBtn.classList.remove('active');
-            }
-        }
-
-        // Очередь
+        // ==================== ОЧЕРЕДЬ ====================
         function addToQueue(index) {
             if (!queue.includes(index)) {
                 queue.push(index);
@@ -1823,28 +2028,27 @@
             }
         }
 
-        function removeFromQueue(index) {
-            queue.splice(index, 1);
+        function removeFromQueue(i) {
+            queue.splice(i, 1);
             updateQueueDisplay();
         }
 
         function updateQueueDisplay() {
             const queueItems = document.getElementById('queueItems');
-            
             if (queue.length === 0) {
                 queueItems.innerHTML = '<div style="text-align: center; color: #B3B3B3;">Очередь пуста</div>';
                 return;
             }
 
             let html = '';
-            queue.forEach((trackIndex, i) => {
-                const track = currentTracks[trackIndex];
-                const songName = track.name.replace(/\.[^/.]+$/, "");
+            queue.forEach((idx, i) => {
+                const track = currentTracks[idx];
+                const name = track.name.replace(/\.[^/.]+$/, "");
                 html += `
-                    <div class="queue-item ${currentTrackIndex === trackIndex ? 'playing' : ''}">
-                        <span class="queue-number">${i + 1}</span>
+                    <div class="queue-item ${currentTrackIndex === idx ? 'playing' : ''}">
+                        <span class="queue-number">${i+1}</span>
                         <div class="queue-item-info">
-                            <div class="queue-item-name">${songName}</div>
+                            <div class="queue-item-name">${name}</div>
                             <div class="queue-item-artist">Из папки music</div>
                         </div>
                         <div class="queue-remove" onclick="removeFromQueue(${i})">✕</div>
@@ -1859,31 +2063,27 @@
             updateQueueDisplay();
         }
 
-        // Любимое
+        // ==================== ЛЮБИМОЕ ====================
         function toggleFavorite(url) {
-            const index = favorites.indexOf(url);
-            if (index === -1) {
+            const idx = favorites.indexOf(url);
+            if (idx === -1) {
                 favorites.push(url);
                 showNotification('❤️', 'Добавлено в любимое');
             } else {
-                favorites.splice(index, 1);
+                favorites.splice(idx, 1);
                 showNotification('💔', 'Удалено из любимого');
             }
             localStorage.setItem('favorites', JSON.stringify(favorites));
             
-            const activeNav = document.querySelector('.nav-item.active');
-            if (activeNav) {
-                if (activeNav.textContent.includes('Главная')) {
-                    showHomePage();
-                } else if (activeNav.textContent.includes('Любимое')) {
-                    showFavoritesPage();
-                } else if (activeNav.textContent.includes('Все треки')) {
-                    showAllTracksPage();
-                }
+            const active = document.querySelector('.nav-item.active');
+            if (active) {
+                if (active.textContent.includes('Главная')) showHomePage();
+                else if (active.textContent.includes('Любимое')) showFavoritesPage();
+                else if (active.textContent.includes('Все треки')) showAllTracksPage();
             }
         }
 
-        // Статистика
+        // ==================== СТАТИСТИКА ====================
         function checkStats() {
             const today = new Date().toDateString();
             if (stats.date !== today) {
@@ -1891,13 +2091,6 @@
                 stats.today = 0;
                 stats.date = today;
                 localStorage.setItem('stats', JSON.stringify(stats));
-            }
-
-            const weekAgo = new Date();
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            if (new Date(stats.lastWeek) < weekAgo) {
-                stats.week = 0;
-                stats.lastWeek = today;
             }
         }
 
@@ -1912,25 +2105,92 @@
         function updateStatsDisplay() {
             document.getElementById('todayStats').textContent = Math.round(stats.today);
             document.getElementById('totalStats').textContent = Math.round(stats.total);
-            updateFullProfileStats();
+            if (document.getElementById('fullStatToday')) {
+                document.getElementById('fullStatToday').textContent = Math.round(stats.today);
+                document.getElementById('fullStatWeek').textContent = Math.round(stats.week);
+                document.getElementById('fullStatTotal').textContent = Math.round(stats.total);
+            }
         }
 
-        // Уведомления
-        function showNotification(title, message) {
-            notificationTitle.textContent = title;
-            notificationMessage.textContent = message;
-            notification.classList.add('show');
+        // ==================== ПРОФИЛЬ ====================
+        function openFullProfile() {
+            profileFull.classList.add('open');
+            updateStatsDisplay();
+            switchProfileTab('favorites');
+        }
+
+        function closeFullProfile() {
+            profileFull.classList.remove('open');
+        }
+
+        function switchProfileTab(tab, el) {
+            document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+            if (el) el.classList.add('active');
+
+            const favTracks = currentTracks.filter(t => favorites.includes(t.download_url));
             
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 2000);
+            if (tab === 'favorites') {
+                let html = '<div class="favorites-grid">';
+                favTracks.slice(0, 20).forEach(t => {
+                    const name = t.name.replace(/\.[^/.]+$/, "");
+                    const idx = currentTracks.findIndex(tr => tr.download_url === t.download_url);
+                    html += `
+                        <div class="favorite-card" onclick="playTrack(${idx})">
+                            <div class="favorite-card-icon">🎵</div>
+                            <div class="favorite-card-info">
+                                <div class="favorite-card-name">${name}</div>
+                                <div class="favorite-card-artist">Из папки music</div>
+                            </div>
+                            <div class="favorite-card-play">▶</div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                if (favTracks.length === 0) html = '<div style="text-align: center; padding: 40px;">Нет любимых треков</div>';
+                document.getElementById('profileContent').innerHTML = html;
+            } else if (tab === 'recent') {
+                document.getElementById('profileContent').innerHTML = '<div style="text-align: center; padding: 40px;">🕒 История прослушиваний появится скоро</div>';
+            } else if (tab === 'stats') {
+                document.getElementById('profileContent').innerHTML = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; text-align: center;">
+                            <div style="font-size: 48px; color: #FC0;">${Math.round(stats.today)}</div>
+                            <div style="color: #B3B3B3;">Минут сегодня</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; text-align: center;">
+                            <div style="font-size: 48px; color: #FC0;">${Math.round(stats.week)}</div>
+                            <div style="color: #B3B3B3;">За неделю</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; text-align: center; grid-column: span 2;">
+                            <div style="font-size: 64px; color: #FC0;">${Math.round(stats.total)}</div>
+                            <div style="color: #B3B3B3;">Всего минут</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; text-align: center;">
+                            <div style="font-size: 48px; color: #FC0;">${currentTracks.length}</div>
+                            <div style="color: #B3B3B3;">Всего треков</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; text-align: center;">
+                            <div style="font-size: 48px; color: #FC0;">${favorites.length}</div>
+                            <div style="color: #B3B3B3;">В любимом</div>
+                        </div>
+                    </div>
+                `;
+            }
         }
 
-        // Прогресс
+        // ==================== УВЕДОМЛЕНИЯ ====================
+        function showNotification(title, msg) {
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = msg;
+            notification.classList.add('show');
+            setTimeout(() => notification.classList.remove('show'), 2000);
+        }
+
+        // ==================== ПРОГРЕСС ====================
         function updateProgress() {
             if (audio.duration) {
-                const percent = (audio.currentTime / audio.duration) * 100;
-                progressBar.style.width = percent + '%';
+                const p = (audio.currentTime / audio.duration) * 100;
+                progressBar.style.width = p + '%';
                 currentTimeSpan.textContent = formatTime(audio.currentTime);
             }
         }
@@ -1939,25 +2199,25 @@
             durationSpan.textContent = formatTime(audio.duration);
         }
 
-        function formatTime(seconds) {
-            if (isNaN(seconds)) return '0:00';
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        function formatTime(s) {
+            if (isNaN(s)) return '0:00';
+            const m = Math.floor(s / 60);
+            const sec = Math.floor(s % 60);
+            return `${m}:${sec < 10 ? '0' : ''}${sec}`;
         }
 
-        function seekTo(event) {
+        function seekTo(e) {
             const rect = progressBarContainer.getBoundingClientRect();
-            const pos = (event.clientX - rect.left) / rect.width;
+            const pos = (e.clientX - rect.left) / rect.width;
             audio.currentTime = pos * audio.duration;
         }
 
-        function setVolume(event) {
+        function setVolume(e) {
             const rect = volumeBarContainer.getBoundingClientRect();
-            const pos = (event.clientX - rect.left) / rect.width;
-            const volume = Math.max(0, Math.min(1, pos));
-            audio.volume = volume;
-            currentVolume = volume * 100;
+            const pos = (e.clientX - rect.left) / rect.width;
+            const vol = Math.max(0, Math.min(1, pos));
+            audio.volume = vol;
+            currentVolume = vol * 100;
             volumeBar.style.width = currentVolume + '%';
         }
 
