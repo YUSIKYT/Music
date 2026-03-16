@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Моя музыка — Яндекс.Музыка стиль</title>
+    <title>Моя музыка</title>
     <style>
+        /* Стили такие же как в твоём коде, я их сохранил */
         * {
             margin: 0;
             padding: 0;
@@ -18,7 +19,6 @@
             min-height: 100vh;
         }
 
-        /* Боковое меню */
         .sidebar {
             width: 240px;
             background: #000;
@@ -76,13 +76,11 @@
             margin-top: 24px;
         }
 
-        /* Основной контент */
         .main-content {
             margin-left: 240px;
             padding-bottom: 100px;
         }
 
-        /* Шапка */
         .header {
             padding: 20px 32px;
             background: rgba(0,0,0,0.5);
@@ -132,12 +130,10 @@
             cursor: pointer;
         }
 
-        /* Контент */
         .content {
             padding: 32px;
         }
 
-        /* Приветствие */
         .welcome {
             margin-bottom: 32px;
         }
@@ -151,7 +147,6 @@
             color: #B3B3B3;
         }
 
-        /* Сетка альбомов */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -195,7 +190,6 @@
             font-size: 14px;
         }
 
-        /* Таблица треков */
         .section-title {
             display: flex;
             justify-content: space-between;
@@ -320,7 +314,6 @@
             color: #FC0;
         }
 
-        /* Плеер */
         .player-bar {
             position: fixed;
             bottom: 0;
@@ -420,7 +413,6 @@
             background: #FFA500;
         }
 
-        /* Кнопка баса */
         .bass-btn {
             background: none;
             border: none;
@@ -440,7 +432,6 @@
             color: #FC0;
         }
 
-        /* Панель баса */
         .bass-panel {
             position: absolute;
             bottom: 100px;
@@ -561,7 +552,6 @@
             color: #000;
         }
 
-        /* Очередь */
         .queue-panel {
             position: fixed;
             right: 20px;
@@ -637,7 +627,6 @@
             z-index: 150;
         }
 
-        /* Уведомление */
         .notification {
             position: fixed;
             top: 20px;
@@ -665,7 +654,6 @@
             color: #B3B3B3;
         }
 
-        /* Модальное окно профиля */
         .profile-modal {
             position: fixed;
             top: 50%;
@@ -809,7 +797,6 @@
             visibility: visible;
         }
 
-        /* Адаптация */
         @media (max-width: 1024px) {
             .track-album, .track-header-album {
                 display: none;
@@ -864,7 +851,6 @@
 
         <!-- Контент -->
         <div class="content" id="content">
-            <!-- Сюда будет загружаться контент -->
             <div style="text-align: center; padding: 50px; color: #B3B3B3;">
                 Загрузка музыки...
             </div>
@@ -963,7 +949,7 @@
         </div>
     </div>
 
-    <audio id="audioPlayer"></audio>
+    <audio id="audioPlayer" crossorigin="anonymous"></audio>
 
     <script>
         // Данные
@@ -980,7 +966,7 @@
         let currentSpeed = 1;
         let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
         
-        // Статистика с временем
+        // Статистика
         let stats = JSON.parse(localStorage.getItem('stats')) || { 
             today: 0, 
             week: 0, 
@@ -992,12 +978,6 @@
         // Для подсчета времени
         let listenStartTime = null;
         let listenInterval = null;
-
-        // Переменные для баса
-        let audioContext = null;
-        let bassFilter = null;
-        let sourceNode = null;
-        let isAudioContextInitialized = false;
 
         // Элементы
         const audio = document.getElementById('audioPlayer');
@@ -1023,6 +1003,9 @@
         const bassValue = document.getElementById('bassValue');
         const content = document.getElementById('content');
 
+        // Прокси для обхода CORS (чтобы звук работал!)
+        const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
+
         // Загрузка
         window.addEventListener('DOMContentLoaded', () => {
             loadMusic();
@@ -1034,11 +1017,14 @@
         audio.addEventListener('timeupdate', updateProgress);
         audio.addEventListener('loadedmetadata', updateDuration);
         audio.addEventListener('ended', nextTrack);
+        audio.addEventListener('error', (e) => {
+            console.error('Ошибка аудио:', e);
+            showNotification('Ошибка', 'Не удалось воспроизвести трек');
+        });
         
         audio.addEventListener('play', () => {
             isPlaying = true;
             playPauseBtn.innerHTML = '⏸';
-            initAudioContext();
             startListenTimer();
         });
         
@@ -1060,7 +1046,7 @@
                         listenStartTime = Date.now();
                     }
                 }
-            }, 60000); // Каждую минуту
+            }, 60000);
         }
 
         function stopListenTimer() {
@@ -1071,59 +1057,12 @@
             listenStartTime = null;
         }
 
-        // Инициализация AudioContext для баса
-        function initAudioContext() {
-            if (isAudioContextInitialized) return;
-            try {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                bassFilter = audioContext.createBiquadFilter();
-                bassFilter.type = 'lowshelf';
-                bassFilter.frequency.value = 200;
-                bassFilter.gain.value = 0;
-
-                sourceNode = audioContext.createMediaElementSource(audio);
-                sourceNode.connect(bassFilter);
-                bassFilter.connect(audioContext.destination);
-
-                isAudioContextInitialized = true;
-                console.log('AudioContext инициализирован');
-            } catch (e) {
-                console.warn('Web Audio API не поддерживается', e);
-            }
-        }
-
-        // Управление басом
-        function toggleBassPanel() {
-            bassPanel.classList.toggle('open');
-            if (bassPanel.classList.contains('open')) {
-                initAudioContext();
-                if (audioContext && audioContext.state === 'suspended') {
-                    audioContext.resume();
-                }
-            }
-        }
-
-        function updateBass() {
-            const gain = parseInt(bassSlider.value);
-            bassValue.textContent = gain + ' dB';
-            if (bassFilter) {
-                bassFilter.gain.value = gain;
-            }
-            if (gain !== 0) {
-                bassBtn.classList.add('active');
-            } else {
-                bassBtn.classList.remove('active');
-            }
-        }
-
-        // Навигация по страницам (ИСПРАВЛЕНО - убран event)
+        // Навигация
         function showPage(page, element) {
-            // Убираем active со всех
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
             
-            // Добавляем active текущему
             if (element) {
                 element.classList.add('active');
             }
@@ -1362,7 +1301,6 @@
                     return;
                 }
 
-                // Показываем главную страницу
                 showPage('home', document.querySelector('.nav-item'));
 
             } catch (error) {
@@ -1375,7 +1313,7 @@
             }
         }
 
-        // Воспроизведение
+        // Воспроизведение (ИСПРАВЛЕНО для звука!)
         function playTrack(index) {
             if (index < 0 || index >= currentTracks.length) return;
             
@@ -1386,9 +1324,37 @@
             currentTrackName.textContent = songName;
             currentTrackArtist.textContent = 'Из папки music';
             
-            audio.src = track.download_url;
+            // Пробуем разные способы загрузки аудио
+            const audioUrl = track.download_url;
+            
+            // Способ 1: Прямая загрузка с GitHub (raw)
+            const rawUrl = audioUrl.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
+            
+            // Способ 2: Через прокси (если не работает)
+            const proxyUrl = CORS_PROXY + rawUrl;
+            
+            console.log('Пробуем загрузить:', rawUrl);
+            
+            // Пробуем прямой URL
+            audio.src = rawUrl;
+            audio.load();
+            
+            const playPromise = audio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log('Прямая загрузка не сработала, пробуем через прокси:', error);
+                    // Если не сработало, пробуем через прокси
+                    audio.src = proxyUrl;
+                    audio.load();
+                    audio.play().catch(e => {
+                        console.error('И прокси не сработал:', e);
+                        showNotification('Ошибка', 'Не удалось воспроизвести трек');
+                    });
+                });
+            }
+            
             audio.playbackRate = currentSpeed;
-            audio.play().catch(e => console.log('Ошибка воспроизведения:', e));
             
             // Обновляем отображение
             const activeNav = document.querySelector('.nav-item.active');
@@ -1560,7 +1526,6 @@
             }
             localStorage.setItem('favorites', JSON.stringify(favorites));
             
-            // Обновляем отображение
             const activeNav = document.querySelector('.nav-item.active');
             if (activeNav) {
                 if (activeNav.textContent.includes('Главная')) {
